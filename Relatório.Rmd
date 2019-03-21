@@ -1,0 +1,1403 @@
+---
+title: |  
+  | Avaliação dos Programas de Pós-graduação da Área de
+  | Psicologia e dos Currículos dos Professores 
+  | e Pesquisadores Cadastrados
+  |
+  |
+subtitle: |
+  | Tópicos Avançados em Computadores - Data Science 4All
+  | Departamento de Ciência da Computação da Universidade de Brasília
+  |
+  | Professores: Jorge Henrique Cabral Fernandes & Ricardo Barros Sampaio  
+  |
+  |
+  |
+  |
+author: |
+  | Alunos:
+  |
+  | Gustavo Durães Almeida
+  | 14/0041249
+  | Estatística
+  |
+  | Olivia Ziller e Silva
+  | 14/0157379 
+  | Estatística
+  |
+  | Rodrigo Neris Silva 
+  | 11/0103297 
+  | Engenharia de Produção
+  |
+  |
+  |
+  |
+  |
+  |
+  |
+  |
+  |
+  |
+date: "2° Semestre 2018"
+header-includes:
+- \usepackage[portuguese]{babel}
+output:
+  pdf_document: default
+  word_document: default 
+  toc: true
+---
+
+```{r setup, include=FALSE}
+library(jsonlite)
+library(readxl)
+library(readr)
+library(readtext)
+library(ggplot2)
+library(tidyverse)
+library(stringr)
+library(igraph)
+library(dplyr)
+library(knitr)
+```
+
+\pagebreak
+
+\tableofcontents
+
+\pagebreak
+
+# Introdução 
+
+O trabalho em questão é objeto de avaliação da disciplina Tópicos Avançados em Computadores, do Departamento de Ciência da Computação da Universidade de Brasília, lecionada pelos professores Jorge Henrique Cabral Fernandes e Ricardo Barros Sampaio no 2º semestre de 2018.
+
+O objetivo é elaborar em linguagem R, um relatório que analise e avalie a produção científica e acadêmica de 4 programas na área de psicologia da Universidade de Brasília: Processos de Desenvolvimento Humano e Saúde, Psicologia Clínica e Cultural, Psicologia social, do Trabalho e das Organizações (PSTO) e Ciências do Comportamento. O desenvolvimento do relatório é baseado no modelo de mineração de dados denominado CRISP-DM, cujo mecanismo será detalhado na seção meodológica.
+
+Com base em informações disponibilizadas na seção de coleta e avaliação quadrienal do site da CAPES é possível obter uma contextualização dos programas de pós-gradução que buscamos analisar. A visão geral de cada um dos programas foi a seguinte:
+
+* Ciências do Comportamento 
+
+Sobre o programa Ciências do Comportamento, sabe-se que é composto por 230 discentes matriculados, 20 docentes, 40 disciplinas e 4 linhas de pesquisa, nomeadas:
+
+1. Cognição, Percepção e Sensação.
+2. Análise Comportamental Aplicada.
+3. Cérebro, Drogas e Comportamento.
+4. Processos Comportamentais Básicos.
+
+* Psicologia Clínica e Cultura
+
+O programa é composto por 286 discentes matriculados, 26 docentes, 39 disciplinas e 5 linhas de pesquisa:
+
+1. Psicanálise, Subjetivação e Cultura
+2. Processos Internacionais no Contexto do Casal da Família, do Grupo e da Comunidade
+3. Psicopatologia, Psicoterapia e Linguagem
+4. Saúde Mental e Cultura
+5. Psicologia da Saúde e Processos Clínicos
+
+* Psicologia Social, do Trabalho e das Organizações (PSTO) 
+
+Sobre o programa Psicologia Social, do Trabalho e das Organizações, sabe-se que é composto por 86 discentes matriculados, 19 docentes, 54 disciplinas e 3 linhas de pesquisa, nomeadas:
+
+1. Avaliação e Medidas em Psicologia
+2. Avaliação e Medidas em Psicologia 
+3. Comportamento Trabalho e Organizações.
+
+* Programa de Processos de Desenvolvimento Humano e Saúde 
+
+Sobre o programa Ciências do Comportamento, sabe-se que é composto por 98 discentes matriculados, 16 docentes, 31 disciplinas e 2 linhas de pesquisa, nomeadas:
+
+1. Processos Educativos e Psicologia Escolar.
+2. Processos de Desenvolvimento e Cultura.
+
+A avaliação quadrienal do programa revela que se divide em duas áreas de concentração, e se destaca pelo forte investimento em saúde e educação básica. Pela migração que ocorreu em 2016, os objetivos do programa foram alterados e ocorreu uma inconsistência entre os dados apresentados no período de trasição. Além disso foram realizadas mudanças em relação às linhas de pesquisa, grade curricular e investimentos em iniciativas inovadoras, (aspectos que foram considerados positivos). 
+
+O programa tem 14 professores cadastrados na plataforma (13 são permanentes e 1 colaborador), 42 projetos de pesquisa em andamento e 2 linhas de pesquisa. 
+
+\newpage
+
+
+# Metodologia 
+
+O Cross Industry Standard Process for Data Mining (CRISP-DM), é uma metodologia própria para processos de mineração de dados. Seus fundamentos e principios mais relevantes, descritos por Fernandes, Jorge H C, Ricardo Barros Sampaio, João Ribas de Moura e Jerônimo AVelar Filho, em “Ciência de Dados para Todos (Data Science   For All) - 2018.1 - Análise da Produção Científica e Acadêmica da Universidade de Brasília - Modelo de Relatório Final da Disciplina - Departamento de Ciência da Computação da UnB”, serão apresentado a seguir.
+
+## Delimitações iniciais
+Em aderência à estrutura do CRISP-DM, algumas delimitações de contexto para o trabalho são apresentadas a seguir:
+
+###Domínio de Aplicação do projeto
+O domínio de aplicação do projeto é o da produção científica e acadêmica brasileira, mais específicamente a produção científica ou produção acadêmica de um subgrupo de pesquisadores vinculados à Universidade de Brasília. O domínio de aplicação do projeto deve ser declarado na introdução ao relatório.
+
+<!--registrada na [base de currículos Lattes](lattes.cnpq.br), do CNPq.-->
+
+###Tipo de Problema abordado
+
+O tipo de problema abordado é o da produção de análises descritivas, quantitativas e de modelagem computacional ou estatística, que permitam caracterizar como e porque ocorre a produção científica e acadêmica de um grupo de pesquisadores. Essa caracterização visa subsidiar a tomada de decisão por membros do Sistema Nacional de Pós-Graduação. O tipo de problema abordado no projeto deve ser declarado na introdução ao relatório.
+
+###Conjunto de Ferramentas e Técnicas
+
+O conjunto de requisitos relativos a ferramentas e técnicas a serem empregadas na execução do trabalho é:
+
+* O relatório deve ser entregue no formato R Markdown, apto à geração de saída \LaTeX e PDF, composto por comandos em R entremeados por descrições textuais que auxiliem na interpretação dos resultados, bem como na compreensão do domínio de conhecimento sob análise.
+* As análises descritivas devem empregar de forma criativa as funções das bibliotecas de ciência de dados em R propostas por Wickham e Grolemund (2016).
+* As análises quantitativas devem lançar mão de recursos gráficos variados, que complementarão análises descritivas com _insights_ sobre de que forma os processos de produção científica e acadêmica contribuem para os resultados apresentados. 
+Por exemplo, os dados analisados possibilitam justificar o eventual crescimento ou decréscimo de índices de produção observados?
+* A modelagem computacional ou estatística avançada dos dados deve usar uma das quatro técnicas prescritas: 
+    + Aprendizado de Máquina (Datacamp, 2018; Kuhn et al., 2018; Bruce e Bruce, 2017); 
+    + Aprendizado Estatístico; 
+    + Mineração de Texto ou; 
+    + Análise de Redes (Kolaczyk e Csárdi, 2014; Lusher et al., 2013; de Nooy et al., 2005).
+
+O conjunto de requisitos relativos a ferramentas e técnicas a serem empregadas na execução do trabalhodo projeto deve ser declarado na parte de metodologia do relatório.
+
+##Modelo de Referência CRISP-DM
+
+Miner (2012), aprofunda: “(…) In CRISP-DM, the complete life cycle of a data mining project is represented with __six phases__: business understanding (determining the purpose of the study), data understanding (data exploration and understanding), data preparation, modeling, evaluation, and deployment.(…). [Miner, Gary. Practical Text Mining and Statistical Analysis for Non-structure Text Data Applications. Academic Press, 2012.]
+
+###Por que usar o CRISP-DM?
+
+Imagine uma analogia entre um projeto de datamining e a preparação de uma receita de bolo para ser usada em uma fábrica. Para iniciar a produção, com base numa receita de comprovada eficácia (metodológica e científica), você tem que minerar os ingredientes (dados) em um grande supermercado (_dataset_). Com os ingredientes você precisa aplicar um método (a forma de misturá-los), colocar os ingredientes numa determinada ordem, mexer por um certo tempo, aquecer por tantos minutos até o bolo ficar pronto e ser aprovado em um ou mais testes de degustação. 
+
+Tendo por objetivo fazer com que essa receita (script de mineração de dados) possa ser executada com sucesso diversas vezes, numa fábrica, será que outro cozinheiro (cientista) que reproduzisse a receita (método) chegaria ao mesmo resultado? Se a metodologia (receita) já foi bastante  testada, então é bem provável que o resultado será o mesmo e seu produto (receita de bolo) será aceito para a produção (_deployment_) de análises para consumo futuro, com base em fundamentos científicos.
+
+### Organização hierárquica de atividades em fases
+
+Dentro de cada fase no CRISP-DM existe uma estrutura hierárquica de atividades genéricas para serem realizadas. Cada uma dessas atividades __genéricas__ pode determinar a execução de atividades __específicas__. 
+
+Voltando ao exemplo do bolo, a atividade ” 1. Entendimento do Bolo” poderia conter uma atividade genérica chamada “1.1. Determinar para que o bolo servirá (simples café da manhã? bolo de aniversário? bolo de casamento?)“. Dentro dessa atividade genérica poderia haver atividades específicas como “1.1.1.Entrevistar o contratante para obter detalhes de onde o bolo será usado?“; “1.1.2. Conversar com os convidados sob alguma necessidade especial (sem lactose? sem glútem?)“, etc. 
+
+### Seis Fases do CRISP-DM
+
+Com base no apresentado, segue uma descrição um pouco mais detalhada das seis fases de um projeto no CRISP-DM, interpretadas no contexto do relatório que você e seu grupo deverão  produzir.
+
+Todas as fases deverão ser adequadamente relatadas no relatório, em seções que aparecem após a seçãoda metodologia 
+
+1. O propósito da fase de __Entendimento do Negócio__ é o desenvolvimento dos objetivos e declaração das necessidades do projeto sob a perspectiva do negócio, para transformar isso tudo em definição de um problema de data mining. 
+
+As atividades genéricas dentro dessa fase envolvem:
+
+* Identificar o que a organização realmente necessita alcançar. No caso específico desta disciplina, a necessidade do Sistema Nacional de Pós-Graduação do Brasil de produzir análises de alta qualidade de suas pós-graduações, com baixo custo. Como produzir um projeto de mineração de dados se você não sabe o que necessita encontrar ou resolver? Se você não entender os objetivos da organização pode levar ao erro de procurar as respostas certas para as perguntas erradas. 
+
+* Avaliação das Circunstâncias. Envolve identificar quais recursos ou dificuldades podem influenciar os  objetivos da mineração ou do projeto em si. No caso específico desta disciplina, isso envolve refletir, entre vários outros aspectos, sobre as limitações de tempo do projeto, que precisa ser realizado dentro de um semestre letivo, de modo que considerável parte das atividades já foram pré-organizadas pelos docentes responsáveis pela disciplina. 
+
+* O projeto de mineração é o grande objetivo desta etapa e o relatório precisa conter uma seção sobre Metodologia, apresentando em detalhes o que se pretende fazer adiante.
+
+2. A fase de __Entendimento dos Dados__ inicia determinando quais são os dados realmente disponíveis na organização, se existe permissão para utilizá-los, se existem dados confidenciais ou cobertos pelo sigilo. Por exemplo, um _dataset_ das declarações de imposto de renda da Receita Federal certamente seria protegido pelo sigilo fiscal. Dados de pacientes de hospitais podem conter restrições.
+
+Também é necessário acessar os dados para compreendê-los melhor para ter o _insight_ de como será feita a modelagem mais tarde.
+
+Na fase de entendimento dos dados pode-se trabalhar com quatro atividades genéricas:
+
+* Coleta inicial dos dados. Essa atividade envolve a análise das permissões de acesso e outras questões envolvendo sigilo e outros proprietários dos dados (terceiros). Por exemplo, eu poderia estar acessando uma base de dados que foi obtida de outro órgão por convênio, mas nesse convênio (contrato) não foi dada permissão para qualquer outro tipo de acesso ou exploração dos dados. Neste projeto, a coleta inicial foi feita pelos autores deste relatório. O relatório final deve conter indicações de como foi realizada a coleta inicial dos dados.
+
+* Descrição dos dados. A descrição dos dados verifica se os dados sendo acessados terão potencial para responder às questões de _data mining_. Além disso, deve-se avaliar qual o volume de dados, a estrutura dos dados (tipos), codificações usadas, etc. Neste projeto, a descrição dos dados é responsabilidade parcial dos alunos, tendo em vista que este modelo já oferece uma descrição inicial. O relatório final deve conter descrições significativas e aprofundadas dos dados.
+
+* Análise exploratória dos dados. A análise exploratória dos dados possibilita um entendimento mais profundo da relação estatística existente entre os dados dos _datasets_ para um melhor entendimento da qualidade daqueles dados para o objetivo do projeto. 
+Neste projeto, a análise exploratória dos dados é responsabilidade parcial dos alunos, tendo em vista que este relatório apresenta uma análise exploratória preliminar.
+O relatório final deve conter análises exploratórias dos dados que sejam significativas e aprofundadas.
+
+* Verificação da qualidade dos dados. A verificação da qualidade dos dados envolve responder se os dados disponíveis estão realmente completos. As informações disponíveis são suficientes para o trabalho proposto? Neste projeto, a verificação da qualidade dos dados é responsabilidade dos alunos.
+
+3. Na fase de __Preparação dos Dados__ os _datasets_ que serão utilizados em todo o trabalho são construídos a partir dos dados brutos. Aqui os dados são “filtrados” retirando-se partes que não interessam e selecionando-se os “campos” necessários para o trabalho de mineração. 
+
+São 5 as atividades genéricas nesta fase de preparação dos dados:
+
+* Seleção dos dados. Envolve identificar quais dados, da nossa "montanha de dados", serão realmente utilizados. Quais variáveis dos dados brutos serão convertidas para o _dataset_? Não é raro cometer o erro de selecionar dados para um modelo preditivo com base em uma falsa ideia de que aqueles dados contém a resposta para o modelo que se quer construir. Surge o cuidado de se separar o sinal do ruído (Silver, Nate. The Signal and the Noise: Why so many predictions fail — but some don’t. USA: The Penguin Press HC, 2012.). 
+
+* Limpeza dos dados.
+
+* Construção dos dados. Envolve a criação de novas variáveis a partir de outras presentes nos _datasets_.
+
+* Integração dos dados. Envolve a união (merge) de diferentes tabelas para criar um único _dataset_ para ser utilizado no R, por exemplo.
+
+* Formatação dos dados. Envolve a realização de pequenas alterações na estrutura dos dados, como a ordem das variáveis, para permitir a execução de determinado método de data mining.
+
+4. A fase de __Modelagem__ no CRISP-DM envolve a construção e avaliação do modelo, podendo ser realizada em quatro atividades genéricas:
+
+* Seleção das técnicas de modelagem.
+
+* Realização de testes de modelagem, onde diferentes modelos são previamente testados e avaliados. Pode-se dividir o _dataset_ criado na etapa anterior para se ter uma base de treino na construção de modelos, e outra pequena parte para validar  e avaliar a eficiência de cada modelo criado até se chegar ao mais “eficiente”. 
+
+* Construção do modelo definitivo, com base na melhor experiência do passo anterior.
+
+* Avaliação do modelo.
+
+5. Na fase de __Avaliação__ do CRISP-DM os resultados não são apenas avaliados, mas se verifica se existem questões relacionadas à organização que não foram suficientemente abordadas. Deve-se refletir se o uso arepetido do modelo criado pode trazer algum “efeito colateral” para a organização. 
+
+Nesta fase, pode-se trabalhar com 3 atividades genéricas:
+
+* Avaliação dos resultados
+
+* Revisão do processo, por meio da qual verifica-se se o modelo foi construído adequadamente. As variáveis (passadas) para construir o modelo estarão disponíveis no futuro?
+
+* Determinação dos etapas seguintes. Pode ser necessário decidir-se por finalizar o projeto, passar à etapa de desenvolvimento, ou rever algumas fases anteriores para a melhoria do projeto.
+
+6. Na fase de __Implantação__ (_deployment_) se realiza o planejamento de implantação dos produtos desenvolvidos (scripts, no caso do executado nesta disciplina) para o ambiente operacional, para seu uso repetitivo, envolvendo atividades de monitoramento e manutenção do sistema (script) desenvolvido. A fase de implantação concluir com a produção e apresentação do relatório final com os resultados do projeto.
+
+São atividades genéricas  na fase de __implantação__:
+
+* Planejamento da transição dos produtos;
+* Planejamento do monitoramento dos produtos em utilização no ambiente operacional;
+* Planejamento de manuteção a ser eventualmente efetuada no produto (scripts);
+* Produção do relatório final;
+* Apresentação do relatório final;
+* Revisão sobre a execução do projeto, com registro de lições aprendidas etc.
+
+No contexto do projeto realizado no âmbito desta disciplina, a responsabilidade por execução de todas essas atividades é dos alunos, com exceção da apresentação do relatório final, que não será realizada.
+
+\newpage
+
+# Desenvolvimento
+
+Seguindo as etapas propostas pelo modelo CRISP-DM foram elaboradas as análises para cada um dos programas.
+
+## Entendimento do Negócio
+
+### Sobre o Sistema Nacional de Pós-Graduação 
+
+A produção do conhecimento científico, no Brasil, é predominantemente efetuada por meio do Sistema Nacional de Pós-Graduação - SNPG, e mais fortemente relacionada com a formação de doutores nesse sistema (Pátaro e Mezzomo, 2013), por meio de cursos de pós-graduação. 
+
+Fernandes e Sampaio (2017) já indicaram que a ciência é reconhecidamente um elemento essencial para o desenvolvimento social e econômico de qualquer nação.
+Assim sendo, faz-se mister aprimorar o SNPG como forma de promoção desse crescimento, visando maximizar o retorno decorrente do emprego dos recursos nele aplicados. 
+
+A promoção do crescimento do SNPG se dá predominantemente por meio de avaliações regulares de seus programas de pós-graduação, sob responsabilidade da CAPES, que realiza a cada quatro anos um complexo (Leite, 2018, p. 13) e custoso processo de coleta de dados, análise e deliberação sobre as pós-graduações, em coerência com o estabelecido no Plano Nacional de Pós-Graduação (PNPG) 2012-2020 (CAPES, 2010) e nos diversos documentos que definem os critérios de organização da pós-graduação em cada área do conhecimento (CAPES, 2018).
+Leite (2018) faz uma apresentação geral  de como se organizam e são avaliadas as pós-graduações no Brasil.
+
+O Plano Nacional de Pós-Graduação (PNPG), por outro lado, define diretrizes estratégicas para desenvolvimento da pós-graduação brasileira, que deve abordar prioritariamente grandes temas de interesse nacional, tais como a redução das assimetrias de desenvolvimento entre as regiões do Brasil, a formação de professores para a educação básica, a formação de recursos humanos para as empresas, a resposta aos grandes desafios brasileiros sobre Água, Energia, Transporte, Controle de Fronteiras, Agronegócio, Amazônia, Amazônia Azul (Mar), Saúde, Defesa, Programa Espacial, além de Justiça, Segurança Pública, Criminologia e Desequilíbrio Regional.
+O PNPG também traça as diretrizes para financiamento da pós-graduação e sua internacionalização, apresentando conclusões e recomendações.
+
+Não há solução simples, mas postula-se, nesta disciplina, que uma maior agilidade na avaliação e a utilização de critérios mais objetivos, poderá facilitar a melhoria do sistema.
+
+### A UnB no Sistema Nacional de Pós-Graduação 
+
+De acordo com a plataforma sucupira, existem 97 programas em funcionamento na Universidade de Brasília no momento. As notas por programa se separam da seguinte maneira:
+
+* 5 programas com nota 7: Antropologia, Desenvolvimento Sustentável, Geologia, Matemática e Sociologia.
+
+* 10 programas com nota 6:  Ciência Política, Ciências Biológicas (Biologia Molecular), Direito, Ecologia, Economia, Geotecnia, Patologia Molecular, Política Social, Psicologia Social do Trabalho e das Organizações (PSTO) e Relações Internacionais.
+ 
+* 18 programas com nota 5:  Administração, Administração (pública), Bioética, Ciências animais, Ciências da informação, Ciências da saúde, Ciências medicas, Contabilidade, Educação, Fitopatologia, Geografia, Informática, Lingüística, Literatura, Matemática em Cede Cacional, Processos de Desenvolvimento Humano e Saúde, Psicologia Clínica e Cultura e Química.
+ 
+* 46 programas com nota 4: Ensino de Ciências Ambientais em Rede Nacional, Agronegócios, Agronomia, Arquitetura E Urbanismo, Artes, Artes Cênicas, Biologia Animal, Biologia Microbiana, Biotecnologia E Biodiversidade - Rede Pró-Centro-Oeste, Ciências Ambientais, Ciências Contábeis, Ciências Do Comportamento, Ciências e Tecnologias Em Saúde, Ciências Farmacêuticas, Ciências Mecânicas, Comunicação, Direitos Humanos e Cidadania, Economia, Educação em Ciências, Educação Física, Enfermagem, Engenharia de Sistemas Eletrônicos e de Automação, Engenharia Elétrica, Ensino de Ciências, Ensino de Física, Estatistica, Estruturas e Construção Civil, Estudos Comparados sobre as Américas, Estudos De Tradução, Filosofia, Física, Geociências Aplicadas E Geodinâmica, Gestão e Regulação de Recursos Hídricos-Profágua, História, Lingüística Aplicada, Medicina Tropical, Metafísica, Nanociência E Nanobiotecnologia, Nutrição Humana, Odontologia, Profartes, Profbio Ensino De Biologia Em Rede Nacional, Profnit - Propriedade Intelectual E Transferência De Tecnologia Para Inovação, Saúde Animal, Saúde Coletiva e Zoologia.
+
+
+Além disso, na última atulização, foram registrados 12 programas desativados: Ciências Agrárias, Ciências Contábeis, Ciências Da Computação, Desenho Urbano, Engenharia Elétrica, Engenharia Mecânica, Estatística e Métodos Quantitativos, Lingüística Aplicada, Medicina (Clínica Médica), Nutrição Humana, Planejamento Urbano e Psicologia.
+
+
+## Preparação e Entendimento dos Dados
+
+Os dados utilizados para a avaliação dos 4 programas de pós graduação da área de psicologia, são provenientes
+da plataforma Ellates e de duas planilhas contendo as áreas de atuação para cada pesquisador e informações
+sobre os docentes. As informações referentes ao perfil dos docentes, orientações de mestrado e/ou doutorado realizadas, produções bibliográficas e redes de colaboração entre os pesquisadores foram importadas e exploratóriamente
+analisanadas na etapa de entendimento dos dados. Tais análises serão apresentadas considerando cada um dos programas de interesse em seguida.
+
+Como o processo de entendimento exige que se faça uma
+limpeza e organização da informação (do ponto de vista da modelagem), as medidas tomadas com relação à
+preparação dos dados também fazem parte desta seção. As principais ações relacionadas à preparação dos dados, envolvem a utilizando funções pré formuladas, com as quais foram construídos data frames com os subníveis da listas importadas. O intuito foi organizar as informações disponibilizadas em um formato tidy de maneira que fosse possível elaborar e construir visualizações (em formato de gráficos e tabelas) para entendimento do programa.
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE, echo=F}
+# Dados - Pós Graduações Psicologia 
+# Ciencias do Comportamento
+perfil255 <- fromJSON("255.profile.json")
+public255 <- fromJSON("255.publication.json")
+orient255 <- fromJSON("255.advise.json")
+graphl255 <- fromJSON("255.graph.json")
+list255 <- fromJSON("255.list.json")
+
+# Processos de Desenvolvimento Humano e Saúde
+perfil315 <- fromJSON("315.profile.json")
+public315 <- fromJSON("315.publication.json")
+orient315 <- fromJSON("315.advise.json")
+graphl315 <- fromJSON("315.graph.json")
+list315 <- fromJSON("315.list.json")
+
+# Psicologia Clinica e Cultura
+perfil319 <- fromJSON("319.profile.json")
+public319 <- fromJSON("319.publication.json")
+orient319 <- fromJSON("319.advise.json")
+graphl319 <- fromJSON("319.graph.json")
+list319 <- fromJSON("319.list.json")
+
+# Psicologia Social do Trabalho e das Organizações
+perfil320 <- fromJSON("320.profile.json")
+public320 <- fromJSON("320.publication.json")
+orient320 <- fromJSON("320.advise.json")
+graphl320 <- fromJSON("320.graph.json")
+list320 <- fromJSON("320.list.json")
+
+# Gerais
+res.area <- fromJSON("unbpos.researchers_by_area.json")
+df.prog <- read.table("prof_prog.csv", sep = ",", 
+                      colClasses = "character", encoding = "UTF-8", header = TRUE)
+
+# Funções 
+source("elattes.ls2df.R")
+```
+
+
+### Ciências do Comportamento
+
+Fazendo algumas avaliações básicas da base de dados que faz referência ao perfil dos docentes, foi encontrado que para o programa de ciências do comportamento existem 20 docentes, atuando (juntos) 71 vezes em 4 áreas.
+
+```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+#Número de Pessoas que foram encontradas
+length(perfil255)
+##Análise dos dados em formato list
+# Número de áreas de atuação cumulativo
+sum(sapply(perfil255, function(x) nrow(x$areas_de_atuacao)))
+# Número de áreas de atuação por pessoa
+kable(table(unlist(sapply(perfil255, function(x) nrow(x$areas_de_atuacao)))))
+```
+
+No que diz respeito à quantidade de atuações por grande área, observou-se (como apresentado na tabela a seguir) que a àrea de Ciências Humanas é aquela com maior número de docentes, seguida por Ciências Biológicas, Ciências da saúde e Ciências Sociais Aplicadas.
+
+```{r message=FALSE, warning=FALSE, echo=F}
+# Número de pessoas por grande area
+kable(table(unlist(sapply(perfil255, function(x) (x$areas_de_atuacao$grande_area)))),col.names = c("Área","Quantidade de Pessoas"),caption="Quantidade de Pessoas por Grande Área")
+```
+
+```{r message=F, warning=F, include=F}
+# Número de pessoas que produziram os específicos tipos de produção
+table(unlist(sapply(perfil255, function(x) names(x$producao_bibiografica))))
+# Número de publicações por tipo
+sum(sapply(perfil255, function(x) length(x$producao_bibiografica$ARTIGO_ACEITO$ano)))
+sum(sapply(perfil255, function(x) length(x$producao_bibiografica$CAPITULO_DE_LIVRO$ano)))
+sum(sapply(perfil255, function(x) length(x$producao_bibiografica$LIVRO$ano)))
+sum(sapply(perfil255, function(x) length(x$producao_bibiografica$PERIODICO$ano)))
+sum(sapply(perfil255, function(x) length(x$producao_bibiografica$TEXTO_EM_JORNAIS$ano)))
+# Número de pessoas por quantitativo de produções por pessoa 0 = 1; 1 = 2...
+table(unlist(sapply(perfil255, function(x) length(x$producao_bibiografica$ARTIGO_ACEITO$ano))))
+table(unlist(sapply(perfil255, function(x) length(x$producao_bibiografica$CAPITULO_DE_LIVRO$ano))))
+table(unlist(sapply(perfil255, function(x) length(x$producao_bibiografica$LIVRO$ano))))
+table(unlist(sapply(perfil255, function(x) length(x$producao_bibiografica$PERIODICO$ano))))
+table(unlist(sapply(perfil255, function(x) length(x$producao_bibiografica$TEXTO_EM_JORNAIS$ano))))
+# Número de produções por ano
+table(unlist(sapply(perfil255, function(x) (x$producao_bibiografica$ARTIGO_ACEITO$ano))))
+table(unlist(sapply(perfil255, function(x) (x$producao_bibiografica$CAPITULO_DE_LIVRO$ano))))
+table(unlist(sapply(perfil255, function(x) (x$producao_bibiografica$LIVRO$ano))))
+table(unlist(sapply(perfil255, function(x) (x$producao_bibiografica$PERIODICO$ano))))
+table(unlist(sapply(perfil255, function(x) (x$producao_bibiografica$TEXTO_EM_JORNAIS$ano))))
+# Número de pessoas que realizaram diferentes tipos de orientações
+length(unlist(sapply(perfil255, function(x) names(x$orientacoes_academicas))))
+# Número de pessoas por tipo de orientação
+table(unlist(sapply(perfil255, function(x) names(x$orientacoes_academicas))))
+#Número de orientações concluidas
+sum(sapply(perfil255, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_MESTRADO$ano)))
+sum(sapply(perfil255, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_DOUTORADO$ano)))
+sum(sapply(perfil255, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_POS_DOUTORADO$ano)))
+
+# Número de pessoas por quantitativo de orientações por pessoa 0 = 1; 1 = 2...
+table(unlist(sapply(perfil255, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_MESTRADO$ano))))
+table(unlist(sapply(perfil255 , function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_DOUTORADO$ano))))
+table(unlist(sapply(perfil255, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_POS_DOUTORADO$ano))))
+
+# Número de orientações por ano
+table(unlist(sapply(perfil255, function(x) (x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_MESTRADO$ano))))
+table(unlist(sapply(perfil255, function(x) (x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_DOUTORADO$ano))))
+table(unlist(sapply(perfil255, function(x) (x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_POS_DOUTORADO$ano))))
+```
+
+
+```{r,message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+# extrai perfis dos professores 
+perfil.df.professores255 <- extrai.perfis(perfil255)
+
+# extrai producao bibliografica de todos os professores 
+perfil.df.publicacoes255 <- extrai.producoes(perfil255)
+
+#extrai orientacoes 
+perfil.df.orientacoes255 <- extrai.orientacoes(perfil255)
+
+#extrai areas de atuacao 
+perfil.df.areas.de.atuacao255 <- extrai.areas.atuacao(perfil255)
+
+#cria arquivo com dados quantitativos para análise
+perfil.df255 <- data.frame()
+perfil.df255 <- perfil.df.professores255 %>% 
+  select(idLattes, nome, resumo_cv, senioridade) %>% 
+  left_join(
+    perfil.df.orientacoes255 %>% 
+      select(orientacao, idLattes) %>% 
+      filter(!grepl("EM_ANDAMENTO", orientacao)) %>% 
+      group_by(idLattes) %>% 
+      count(orientacao) %>% 
+      spread(key = orientacao, value = n), 
+    by = "idLattes") %>% 
+  left_join(
+    perfil.df.publicacoes255 %>% 
+      select(tipo_producao, idLattes) %>% 
+      filter(!grepl("ARTIGO_ACEITO", tipo_producao)) %>% 
+      group_by(idLattes) %>% 
+      count(tipo_producao) %>% 
+      spread(key = tipo_producao, value = n), 
+    by = "idLattes") %>% 
+  left_join(
+    perfil.df.areas.de.atuacao255 %>% 
+      select(area, idLattes) %>% 
+      group_by(idLattes) %>% 
+      summarise(n_distinct(area)), 
+    by = "idLattes")
+
+```
+
+O gráfico a seguir apresenta os números relativos à quantidade de produções bibliográficas por tipo feitas por docentes do programa de ciências do comportamento, de onde podemos avaliar que  periódicos são os tipos mais publicados, seguidos de
+eventos, capítulos de livro, textos em jornais, livros, artigo e outros.
+
+```{r,echo=F,message=FALSE, warning=FALSE,fig.height=4}
+publicacoes255 <- perfil.df.publicacoes255 %>% group_by(tipo_producao) %>% summarise(total=n()) %>% arrange(desc(total)) %>%
+mutate(tipo_producao =tipo_producao %>% factor() %>% fct_relevel(tipo_producao) %>% 
+fct_recode("Periódicos"="PERIODICO","Eventos"="EVENTO","Capítulo de Livros" = "CAPITULO_DE_LIVRO",
+Livros = "LIVRO","Demais Tipos"="DEMAIS_TIPOS_DE_PRODUCAO_BIBLIOGRAFICA",
+Artigo = "ARTIGO_ACEITO", "Texto em Jornais" = "TEXTO_EM_JORNAIS"))
+
+ggplot(publicacoes255,aes(tipo_producao,total))+geom_col(fill=adjustcolor("blue",.4))+xlab("Tipo de Publicação")+ylab("Quantidade de Publicações")+theme(text = element_text(size=9))+
+ggtitle("Quantitativo de Publicações")
+```
+
+Ao considerar o ano em que foram publicados, podemos observar (com auxílio do gráfico a seguir), que periódicos se mantém sempre em maior quantidade, em especial no ano de 2013. No ano de 2010 os textos em jornais se mantiveram acima de sua média, superando publicações em capítulos de livros. Nos demais anos, os comportamentos das categorias não se diferem tanto.
+
+
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center",fig.height=3}
+publicacoesano255 <- perfil.df.publicacoes255 %>% group_by(tipo_producao,ano) %>% summarise(total=n()) %>% arrange(desc(total)) %>% ungroup() %>% 
+mutate(tipo_producao =tipo_producao %>% factor() %>% 
+fct_recode("Periódicos"="PERIODICO","Eventos"="EVENTO","Capítulo de Livros" = "CAPITULO_DE_LIVRO",
+Livros = "LIVRO","Demais Tipos"="DEMAIS_TIPOS_DE_PRODUCAO_BIBLIOGRAFICA",
+Artigo = "ARTIGO_ACEITO", "Texto em Jornais" = "TEXTO_EM_JORNAIS"
+)) %>% filter(!is.na(ano))
+publicacoesano255 <- publicacoesano255 %>% spread(ano,total) %>% gather(ano,total,-tipo_producao) %>% mutate(ano=as.numeric(ano))
+publicacoesano255[is.na(publicacoesano255)] <- 0
+
+ggplot(publicacoesano255,aes(ano,total,color=tipo_producao))+geom_line()+xlab("Tipo de Publicação")+ylab("Quantidade de Publicações")+
+ggtitle("Quantitativo de Publicações")+scale_color_manual("Tipo de Publicação",values=c("red","blue","orange","green","purple","black"))
+```
+
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center",include=F}
+public.periodico.df255 <- pub.ls2df(public255, 1) #artigos
+public.livros.df255 <- pub.ls2df(public255, 2) #livros
+public.eventos.df255 <- pub.ls2df(public255, 5) #eventos
+#Publicação por ano
+kable(table(public.eventos.df255$nome_do_evento),col.names=c("Ano","Publicações"),caption="Quantidade de Publicações por Ano ")
+```
+
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center",fig.height=2,include=F}
+public.periodico.df255 %>%
+  group_by(ano) %>%
+  summarise(Quantidade = n()) %>%
+  ggplot(aes(x = ano, y = Quantidade)) +
+  geom_bar(position = "stack",stat = "identity", fill = "darkcyan")+
+  geom_text(aes(label=Quantidade), vjust=-0.3, size=2.5)+
+  theme_minimal()
+```
+
+
+Utilizando o banco que relaciona as publicações, foi possível obter a seguinte tabela, que apresenta as 20 revistas mais publicadas, em ordem decrescente.
+
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center",fig.height=3}
+kable(head(sort(table(as.data.frame(unlist
+    (sapply(public255$PERIODICO, function(x) unlist(x$periodico)))
+  )), decreasing = TRUE),20), col.names = c("Revista","Número de Publicações"),position="center",caption = "20 Revistas mais Publicadas")
+```
+
+
+Para avaliar a quantidade de participações em eventos por país foi feito um gráfico de pontos, com o qual percebemos que a maior parte dos eventos com participação dos docentes ocorreu no Brasil, seguido por Estados Unidos, Grã-Bretanha. 
+
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center"}
+  #Eventos
+public.eventos.df255 %>%
+  filter(pais_do_evento %in% 
+           c(names(head(sort(table(public.eventos.df255$pais_do_evento)
+                             , decreasing = TRUE), 10)))) %>%
+  group_by(ano_do_trabalho,pais_do_evento) %>%
+  ggplot(aes(x=ano_do_trabalho,y=pais_do_evento, color= pais_do_evento)) +
+  xlab("Ano") + ylab("Pais") + geom_point() + geom_jitter()
+```
+
+No que diz respeito à quantidade de orientações realizadas, percebemos pelo gráfico abaixo que dissertações de mestrados foram as que tiveram maior quantidade em todos os anos, seguido por testes de doutorado e supervisão de pós doutorado.
+
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center",fig.height=3}
+##Análise dos dados no formato DF
+orient.posdoutorado.df255 <- ori.ls2df(orient255, 6) #pos-Doutorado concluído
+orient.doutorado.df255 <- ori.ls2df(orient255, 7) #Doutorado concluído
+orient.mestrado.df255 <- ori.ls2df(orient255, 8) #Mestrado concluído
+
+orient.df255 <- rbind(rbind(orient.posdoutorado.df255, orient.doutorado.df255), orient.mestrado.df255)
+
+ggplot(orient.df255,aes(ano,fill=natureza)) +
+  geom_bar(stat = "count", position="dodge") +
+  ggtitle("Natureza das Orientações Completas Por Ano") +
+  theme(legend.position="right",legend.text=element_text(size=7)) +
+  guides(fill=guide_legend(nrow=5, byrow=TRUE, title.position = "top")) +
+  labs(x="Ano",y="Quantidade")
+```
+
+### Processos de Desenvolvimento Humano e Saúde 
+
+Sobre o programa de Processos de Desenvolvimento Humano e Saúde, verificou-se que existem 14 docentes. 
+
+```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+#Número de Pessoas que foram encontradas
+length(perfil315)
+##Análise dos dados em formato list
+# Número de áreas de atuação cumulativo
+sum(sapply(perfil315, function(x) nrow(x$areas_de_atuacao)))
+# Número de áreas de atuação por pessoa
+table(unlist(sapply(perfil315, function(x) nrow(x$areas_de_atuacao))))
+```
+
+Quanto às grandes áreas em que se envolvem os docentes, foram identificadas 74 atuações em 3 áreas distintas, distribuídas como na tabela a seguir:
+
+```{r message=F, warning=F, echo=F}
+# Número de pessoas por grande area
+kable(table(unlist(sapply(perfil315, function(x) (x$areas_de_atuacao$grande_area)))),col.names=c("Área","Quantidade de Atuações por Grande Área"),caption="Quantidade de Pessoas por Grande Área")
+```
+
+```{r message=F,warning=F, include=F}
+# Número de pessoas que produziram os específicos tipos de produção
+table(unlist(sapply(perfil315, function(x) names(x$producao_bibiografica))))
+# Número de publicações por tipo
+sum(sapply(perfil315, function(x) length(x$producao_bibiografica$ARTIGO_ACEITO$ano)))
+sum(sapply(perfil315, function(x) length(x$producao_bibiografica$CAPITULO_DE_LIVRO$ano)))
+sum(sapply(perfil315, function(x) length(x$producao_bibiografica$LIVRO$ano)))
+sum(sapply(perfil315, function(x) length(x$producao_bibiografica$PERIODICO$ano)))
+sum(sapply(perfil315, function(x) length(x$producao_bibiografica$TEXTO_EM_JORNAIS$ano)))
+# Número de pessoas por quantitativo de produções por pessoa 0 = 1; 1 = 2...
+table(unlist(sapply(perfil315, function(x) length(x$producao_bibiografica$ARTIGO_ACEITO$ano))))
+table(unlist(sapply(perfil315, function(x) length(x$producao_bibiografica$CAPITULO_DE_LIVRO$ano))))
+table(unlist(sapply(perfil315, function(x) length(x$producao_bibiografica$LIVRO$ano))))
+table(unlist(sapply(perfil315, function(x) length(x$producao_bibiografica$PERIODICO$ano))))
+table(unlist(sapply(perfil315, function(x) length(x$producao_bibiografica$TEXTO_EM_JORNAIS$ano))))
+# Número de produções por ano
+table(unlist(sapply(perfil315, function(x) (x$producao_bibiografica$ARTIGO_ACEITO$ano))))
+table(unlist(sapply(perfil315, function(x) (x$producao_bibiografica$CAPITULO_DE_LIVRO$ano))))
+table(unlist(sapply(perfil315, function(x) (x$producao_bibiografica$LIVRO$ano))))
+table(unlist(sapply(perfil315, function(x) (x$producao_bibiografica$PERIODICO$ano))))
+table(unlist(sapply(perfil315, function(x) (x$producao_bibiografica$TEXTO_EM_JORNAIS$ano))))
+# Número de pessoas que realizaram diferentes tipos de orientações
+length(unlist(sapply(perfil315, function(x) names(x$orientacoes_academicas))))
+# Número de pessoas por tipo de orientação
+table(unlist(sapply(perfil315, function(x) names(x$orientacoes_academicas))))
+#Número de orientações concluidas
+sum(sapply(perfil315, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_MESTRADO$ano)))
+sum(sapply(perfil315, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_DOUTORADO$ano)))
+sum(sapply(perfil315, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_POS_DOUTORADO$ano)))
+
+# Número de pessoas por quantitativo de orientações por pessoa 0 = 1; 1 = 2...
+table(unlist(sapply(perfil315, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_MESTRADO$ano))))
+table(unlist(sapply(perfil315 , function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_DOUTORADO$ano))))
+table(unlist(sapply(perfil315, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_POS_DOUTORADO$ano))))
+
+# Número de orientações por ano
+table(unlist(sapply(perfil315, function(x) (x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_MESTRADO$ano))))
+table(unlist(sapply(perfil315, function(x) (x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_DOUTORADO$ano))))
+table(unlist(sapply(perfil315, function(x) (x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_POS_DOUTORADO$ano))))
+
+# extrai perfis dos professores 
+perfil.df.professores315 <- extrai.perfis(perfil315)
+
+# extrai producao bibliografica de todos os professores 
+perfil.df.publicacoes315 <- extrai.producoes(perfil315)
+
+#extrai orientacoes 
+perfil.df.orientacoes315 <- extrai.orientacoes(perfil315)
+
+#extrai areas de atuacao 
+perfil.df.areas.de.atuacao315 <- extrai.areas.atuacao(perfil315)
+
+#cria arquivo com dados quantitativos para análise
+perfil.df315 <- data.frame()
+perfil.df315 <- perfil.df.professores315 %>% 
+  select(idLattes, nome, resumo_cv, senioridade) %>% 
+  left_join(
+    perfil.df.orientacoes315 %>% 
+      select(orientacao, idLattes) %>% 
+      filter(!grepl("EM_ANDAMENTO", orientacao)) %>% 
+      group_by(idLattes) %>% 
+      count(orientacao) %>% 
+      spread(key = orientacao, value = n), 
+    by = "idLattes") %>% 
+  left_join(
+    perfil.df.publicacoes315 %>% 
+      select(tipo_producao, idLattes) %>% 
+      filter(!grepl("ARTIGO_ACEITO", tipo_producao)) %>% 
+      group_by(idLattes) %>% 
+      count(tipo_producao) %>% 
+      spread(key = tipo_producao, value = n), 
+    by = "idLattes") %>% 
+  left_join(
+    perfil.df.areas.de.atuacao315 %>% 
+      select(area, idLattes) %>% 
+      group_by(idLattes) %>% 
+      summarise(n_distinct(area)), 
+    by = "idLattes")
+```
+
+
+Considerando as produções bibliográficas dos docentes do programa, observamos que apresentações eventos foram aquelas com maior frequência, atingindo mais de 300 ocorrências. Em contra-partida publicações em artigos foram as menos recorrentes. Tal comportamento pode ser detectado pelo gráfico a seguir.
+
+
+```{r, echo=F,message=FALSE, warning=FALSE, fig.align="center",fig.height=3}
+publicacoes315 <- perfil.df.publicacoes315 %>% group_by(tipo_producao) %>% summarise(total=n()) %>% arrange(desc(total)) %>%
+mutate(tipo_producao =tipo_producao %>% factor() %>% fct_relevel(tipo_producao) %>% 
+fct_recode("Periódicos"="PERIODICO","Eventos"="EVENTO","Capítulo de Livros" = "CAPITULO_DE_LIVRO",
+Livros = "LIVRO","Demais Tipos"="DEMAIS_TIPOS_DE_PRODUCAO_BIBLIOGRAFICA",
+Artigo = "ARTIGO_ACEITO", "Texto em Jornais" = "TEXTO_EM_JORNAIS"))
+
+ggplot(publicacoes315,aes(tipo_producao,total))+geom_col(fill=adjustcolor("blue",.4))+xlab("Tipo de Publicação")+ylab("Quantidade de Publicações")+theme(text = element_text(size=9))+
+ggtitle("Quantitativo de Publicações")
+```
+
+Ao avaliar os quantitativos das publicações por ano, (representados pelo gráfico abaixo) percebemos que capítulos de livros e periódicos se alternam entre primeiros e segundos maiores números. Enquanto livros se mantém com terceira maior frequência (com excessão dos anos de 2011 e 2017). Além disso, é interessante notar que até o ano de 2015, não haviam publicações em artigo no programa em questão. 
+
+```{r, echo=F,message=FALSE, warning=FALSE, fig.align="center",fig.height=3}
+publicacoesano315 <- perfil.df.publicacoes315 %>% group_by(tipo_producao,ano) %>% summarise(total=n()) %>% arrange(desc(total)) %>% ungroup() %>% 
+mutate(tipo_producao =tipo_producao %>% factor() %>% 
+fct_recode("Periódicos"="PERIODICO","Eventos"="EVENTO","Capítulo de Livros" = "CAPITULO_DE_LIVRO",
+Livros = "LIVRO","Demais Tipos"="DEMAIS_TIPOS_DE_PRODUCAO_BIBLIOGRAFICA",
+Artigo = "ARTIGO_ACEITO", "Texto em Jornais" = "TEXTO_EM_JORNAIS"
+)) %>% filter(!is.na(ano))
+publicacoesano315 <- publicacoesano315 %>% spread(ano,total) %>% gather(ano,total,-tipo_producao) %>% mutate(ano=as.numeric(ano))
+publicacoesano315[is.na(publicacoesano315)] <- 0
+
+ggplot(publicacoesano315,aes(ano,total,color=tipo_producao))+geom_line()+xlab("Tipo de Publicação")+ylab("Quantidade de Publicações")+
+ggtitle("Quantitativo de Publicações")+scale_color_manual("Tipo de Publicação",values=c("red","blue","orange","green","purple","black"))
+```
+
+A tabela a seguir, apresenta as 20 revistas com maior número de públicacções de docentes do programa de Processos de Desenvolvimento Humano e Saúde. Observa-se que o maior número de públicações foram feitas na revista Psicolodia em Estudo (um total de 8 publicações).
+
+```{r, echo=F,message=FALSE, warning=FALSE, fig.align="center"}
+kable(head(sort(table(as.data.frame(unlist
+    (sapply(public315$PERIODICO, function(x) unlist(x$periodico)))
+  )), decreasing = TRUE),20), col.names = c("Revista","Número de Publicações"),position="center",caption = "20 Revistas mais Publicadas")
+```
+
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center",include=F}
+public.periodico.df315 <- pub.ls2df(public315, 1) #artigos
+public.livros.df315 <- pub.ls2df(public315, 2) #livros
+public.eventos.df315 <- pub.ls2df(public315, 5) #eventos
+#Publicação por ano
+kable(table(public.periodico.df315$ano),col.names=c("Ano","Publicações"),caption="Quantidade de Publicações por Ano")
+```
+
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center",include=F,fig.height=3}
+public.periodico.df315 %>%
+  group_by(ano) %>%
+  summarise(Quantidade = n()) %>%
+  ggplot(aes(x = ano, y = Quantidade)) +
+  geom_bar(position = "stack",stat = "identity", fill = "darkcyan")+
+  geom_text(aes(label=Quantidade), vjust=-0.3, size=2.5)+
+  theme_minimal()
+```
+
+Sobre os eventos em que houve participação, observou-se que Brasil, Portugal e Estados Unidos foram os países que mais receberam envolvidos no programa. Esta distribuição pode ser verificado pelo grafico a seguir.
+
+```{r warning=F, message=F, echo=F,fig.height=3}
+  #Eventos
+public.eventos.df315 %>%
+  filter(pais_do_evento %in% 
+           c(names(head(sort(table(public.eventos.df315$pais_do_evento)
+                             , decreasing = TRUE), 10)))) %>%
+  group_by(ano_do_trabalho,pais_do_evento) %>%
+  ggplot(aes(x=ano_do_trabalho,y=pais_do_evento, color= pais_do_evento)) +
+  xlab("Ano") + ylab("Pais") + geom_point() + geom_jitter()
+```
+
+Quanto às orientações realizadas, observou-se (com auxílio do gráfico a seguir), que em todos os anos as dissertações de mestrado foram as mais frequentes, seguidas de teses de doutorado e supervisão de pós doutorado. Além disso, é interessante notar, que supervisões de pós doutorado no programa só iniciaram em 2015 (mesmo ano em que artigos passaram a ser publicados).
+
+```{r warning=F, echo=F, message=F,fig.height=3}
+##Análise dos dados no formato DF
+orient.posdoutorado.df315 <- ori.ls2df(orient315, 6) #pos-Doutorado concluído
+orient.doutorado.df315 <- ori.ls2df(orient315, 7) #Doutorado concluído
+orient.mestrado.df315 <- ori.ls2df(orient315, 8) #Mestrado concluído
+
+orient.df315 <- rbind(rbind(orient.posdoutorado.df315, orient.doutorado.df315), orient.mestrado.df315)
+
+ggplot(orient.df315,aes(ano,fill=natureza)) +
+  geom_bar(stat = "count", position="dodge") +
+  ggtitle("Natureza das Orientações Completas Por Ano") +
+  theme(legend.position="right",legend.text=element_text(size=7)) +
+  guides(fill=guide_legend(nrow=5, byrow=TRUE, title.position = "top")) +
+  labs(x="Ano",y="Quantidade")
+```
+
+#### Psicologia Clínica e Cultural 
+
+Avaliando a base de dados que contém informações do perfil dos docentes, foi encontrado que para o programa de Psicologia Clínica e Cultural existem 26 docentes, que atuaram 112 vezes em 5 áreas distintas (como podemos perceber verificar na tabela a seguir).
+
+```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+#Número de Pessoas que foram encontradas
+length(perfil319)
+##Análise dos dados em formato list
+# Número de áreas de atuação cumulativo
+sum(sapply(perfil319, function(x) nrow(x$areas_de_atuacao)))
+# Número de áreas de atuação por pessoa
+table(unlist(sapply(perfil319, function(x) nrow(x$areas_de_atuacao))))
+```
+
+```{r warning=F, message=F, echo=F}
+# Número de pessoas por grande area
+kable(table(unlist(sapply(perfil319, function(x) (x$areas_de_atuacao$grande_area)))), col.names=c("Área","Quantidade de Atuações"), caption="Quantidade de Atuações por Grande Área")
+```
+
+```{r warning=F,message=F, include=F}
+# Número de pessoas que produziram os específicos tipos de produção
+table(unlist(sapply(perfil319, function(x) names(x$producao_bibiografica))))
+# Número de publicações por tipo
+sum(sapply(perfil319, function(x) length(x$producao_bibiografica$ARTIGO_ACEITO$ano)))
+sum(sapply(perfil319, function(x) length(x$producao_bibiografica$CAPITULO_DE_LIVRO$ano)))
+sum(sapply(perfil319, function(x) length(x$producao_bibiografica$LIVRO$ano)))
+sum(sapply(perfil319, function(x) length(x$producao_bibiografica$PERIODICO$ano)))
+sum(sapply(perfil319, function(x) length(x$producao_bibiografica$TEXTO_EM_JORNAIS$ano)))
+# Número de pessoas por quantitativo de produções por pessoa 0 = 1; 1 = 2...
+table(unlist(sapply(perfil319, function(x) length(x$producao_bibiografica$ARTIGO_ACEITO$ano))))
+table(unlist(sapply(perfil319, function(x) length(x$producao_bibiografica$CAPITULO_DE_LIVRO$ano))))
+table(unlist(sapply(perfil319, function(x) length(x$producao_bibiografica$LIVRO$ano))))
+table(unlist(sapply(perfil319, function(x) length(x$producao_bibiografica$PERIODICO$ano))))
+table(unlist(sapply(perfil319, function(x) length(x$producao_bibiografica$TEXTO_EM_JORNAIS$ano))))
+# Número de produções por ano
+table(unlist(sapply(perfil319, function(x) (x$producao_bibiografica$ARTIGO_ACEITO$ano))))
+table(unlist(sapply(perfil319, function(x) (x$producao_bibiografica$CAPITULO_DE_LIVRO$ano))))
+table(unlist(sapply(perfil319, function(x) (x$producao_bibiografica$LIVRO$ano))))
+table(unlist(sapply(perfil319, function(x) (x$producao_bibiografica$PERIODICO$ano))))
+table(unlist(sapply(perfil319, function(x) (x$producao_bibiografica$TEXTO_EM_JORNAIS$ano))))
+# Número de pessoas que realizaram diferentes tipos de orientações
+length(unlist(sapply(perfil319, function(x) names(x$orientacoes_academicas))))
+# Número de pessoas por tipo de orientação
+table(unlist(sapply(perfil319, function(x) names(x$orientacoes_academicas))))
+#Número de orientações concluidas
+sum(sapply(perfil319, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_MESTRADO$ano)))
+sum(sapply(perfil319, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_DOUTORADO$ano)))
+sum(sapply(perfil319, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_POS_DOUTORADO$ano)))
+
+# Número de pessoas por quantitativo de orientações por pessoa 0 = 1; 1 = 2...
+table(unlist(sapply(perfil319, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_MESTRADO$ano))))
+table(unlist(sapply(perfil319 , function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_DOUTORADO$ano))))
+table(unlist(sapply(perfil319, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_POS_DOUTORADO$ano))))
+
+# Número de orientações por ano
+table(unlist(sapply(perfil319, function(x) (x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_MESTRADO$ano))))
+table(unlist(sapply(perfil319, function(x) (x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_DOUTORADO$ano))))
+table(unlist(sapply(perfil319, function(x) (x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_POS_DOUTORADO$ano))))
+
+# extrai perfis dos professores 
+perfil.df.professores319 <- extrai.perfis(perfil319)
+
+# extrai producao bibliografica de todos os professores 
+perfil.df.publicacoes319 <- extrai.producoes(perfil319)
+
+#extrai orientacoes 
+perfil.df.orientacoes319 <- extrai.orientacoes(perfil319)
+
+#extrai areas de atuacao 
+perfil.df.areas.de.atuacao319 <- extrai.areas.atuacao(perfil319)
+
+#cria arquivo com dados quantitativos para análise
+perfil.df319 <- data.frame()
+perfil.df319 <- perfil.df.professores319 %>% 
+  select(idLattes, nome, resumo_cv, senioridade) %>% 
+  left_join(
+    perfil.df.orientacoes319 %>% 
+      select(orientacao, idLattes) %>% 
+      filter(!grepl("EM_ANDAMENTO", orientacao)) %>% 
+      group_by(idLattes) %>% 
+      count(orientacao) %>% 
+      spread(key = orientacao, value = n), 
+    by = "idLattes") %>% 
+  left_join(
+    perfil.df.publicacoes319 %>% 
+      select(tipo_producao, idLattes) %>% 
+      filter(!grepl("ARTIGO_ACEITO", tipo_producao)) %>% 
+      group_by(idLattes) %>% 
+      count(tipo_producao) %>% 
+      spread(key = tipo_producao, value = n), 
+    by = "idLattes") %>% 
+  left_join(
+    perfil.df.areas.de.atuacao319 %>% 
+      select(area, idLattes) %>% 
+      group_by(idLattes) %>% 
+      summarise(n_distinct(area)), 
+    by = "idLattes")
+
+```
+
+Com auxílio visual do gráfico a seguir (que diz respeito à quantidade de públicações de docentes do programa), podemos perceber que a maior parte das publicações partem de periódicos, seguido de eventos e capítulos de livro. Texto em jornais são os tipos de publicações que menos frequentes dentre as categorias consideradas. 
+
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center"}
+publicacoes319 <- perfil.df.publicacoes319 %>% group_by(tipo_producao) %>% summarise(total=n()) %>% arrange(desc(total)) %>%
+mutate(tipo_producao =tipo_producao %>% factor() %>% fct_relevel(tipo_producao) %>% 
+fct_recode("Periódicos"="PERIODICO","Eventos"="EVENTO","Capítulo de Livros" = "CAPITULO_DE_LIVRO",
+Livros = "LIVRO","Demais Tipos"="DEMAIS_TIPOS_DE_PRODUCAO_BIBLIOGRAFICA",
+Artigo = "ARTIGO_ACEITO", "Texto em Jornais" = "TEXTO_EM_JORNAIS"))
+
+ggplot(publicacoes319,aes(tipo_producao,total))+geom_col(fill=adjustcolor("blue",.4))+xlab("Tipo de Publicação")+ylab("Quantidade de Publicações")+theme(text = element_text(size=9))+
+ggtitle("Quantitativo de Publicações")
+
+```
+
+Quando consideramos o ano em que foram publicados, percebe-se que publicações em capítulos de livros e periódicos se mantém sempre no topo, enquanto artigos e textos em jornais aparecem com menor frequência.
+
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center",fig.height=3}
+publicacoesano319 <- perfil.df.publicacoes319 %>% group_by(tipo_producao,ano) %>% summarise(total=n()) %>% arrange(desc(total)) %>% ungroup() %>% 
+mutate(tipo_producao =tipo_producao %>% factor() %>% 
+fct_recode("Periódicos"="PERIODICO","Eventos"="EVENTO","Capítulo de Livros" = "CAPITULO_DE_LIVRO",
+Livros = "LIVRO","Demais Tipos"="DEMAIS_TIPOS_DE_PRODUCAO_BIBLIOGRAFICA",
+Artigo = "ARTIGO_ACEITO", "Texto em Jornais" = "TEXTO_EM_JORNAIS"
+)) %>% filter(!is.na(ano))
+publicacoesano319 <- publicacoesano319 %>% spread(ano,total) %>% gather(ano,total,-tipo_producao) %>% mutate(ano=as.numeric(ano))
+publicacoesano319[is.na(publicacoesano319)] <- 0
+
+ggplot(publicacoesano319,aes(ano,total,color=tipo_producao))+geom_line()+xlab("Tipo de Publicação")+ylab("Quantidade de Publicações")+
+ggtitle("Quantitativo de Publicações")+scale_color_manual("Tipo de Publicação",values=c("red","blue","orange","green","purple","black"))
+```
+
+Para avaliar as revistas com maior número de publicações da área, foi construída a tabela a seguir, com a qual percebemos que "Psicologia: Teoria e Pesquisa)", "Estudos de Psicologia" e "Revista Mal-Estar e Subjetividade" são as revistas com maior que mais apresentam conteúdo do programa. 
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center"}
+kable(head(sort(table(as.data.frame(unlist
+    (sapply(public319$PERIODICO, function(x) unlist(x$periodico)))
+  )), decreasing = TRUE),20), col.names = c("Revista","Número de Publicações"),position="center",caption="20 Revistas mais Publicadas")
+```
+
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center", include=F}
+public.periodico.df319 <- pub.ls2df(public319, 1) #artigos
+public.livros.df319 <- pub.ls2df(public319, 2) #livros
+public.eventos.df319 <- pub.ls2df(public319, 5) #eventos
+#Publicação por ano
+kable(table(public.periodico.df319$ano),col.names=c("Ano","Publicações"),caption="Quantidade de Publicações por Ano")
+
+public.periodico.df319 %>%
+  group_by(ano) %>%
+  summarise(Quantidade = n()) %>%
+  ggplot(aes(x = ano, y = Quantidade)) +
+  geom_bar(position = "stack",stat = "identity", fill = "darkcyan")+
+  geom_text(aes(label=Quantidade), vjust=-0.3, size=2.5)+
+  theme_minimal()
+```
+
+No que diz respeito aos eventos atendidos por pessoas do programa de Psicologia Clínica e Cultura, percebe-se (com auxílio do gráfico abaixo), que Brasil, Estados Unidos e Espanha foram os países de maior participação registrada.
+
+```{r, warning=F, echo=F, message=F,fig.height=3}
+  #Eventos
+public.eventos.df319 %>%
+  filter(pais_do_evento %in% 
+           c(names(head(sort(table(public.eventos.df319$pais_do_evento)
+                             , decreasing = TRUE), 10)))) %>%
+  group_by(ano_do_trabalho,pais_do_evento) %>%
+  ggplot(aes(x=ano_do_trabalho,y=pais_do_evento, color= pais_do_evento)) +
+  xlab("Ano") + ylab("Pais") + geom_point() + geom_jitter()
+```
+
+Verificou-se também que com excessão dos ano de 2016 e 2017, (em que orientações em teses de doutorado se igualaram e superaram e as de mestrado, respectivamente), as orientações de mestrado aparecem em maior quantidade. Além disso, foram registradas orientações em teses de doutorado (em números relativamente pequenos) apenas nos anos de 2012 a 2016.
+
+```{r, warning=F, echo=F, message=F,fig.height=3}
+##Análise dos dados no formato DF
+orient.posdoutorado.df319 <- ori.ls2df(orient319, 6) #pos-Doutorado concluído
+orient.doutorado.df319 <- ori.ls2df(orient319, 7) #Doutorado concluído
+orient.mestrado.df319 <- ori.ls2df(orient319, 8) #Mestrado concluído
+
+orient.df319 <- rbind(rbind(orient.posdoutorado.df319, orient.doutorado.df319), orient.mestrado.df319)
+
+ggplot(orient.df319,aes(ano,fill=natureza)) +
+  geom_bar(stat = "count", position="dodge") +
+  ggtitle("Natureza das Orientações Completas Por Ano") +
+  theme(legend.position="right",legend.text=element_text(size=7)) +
+  guides(fill=guide_legend(nrow=5, byrow=TRUE, title.position = "top")) +
+  labs(x="Ano",y="Quantidade")
+```
+
+
+
+#### Psicologia Social, do Trabalho e das Organizações (PSTO)
+
+Fazendo algumas manipulaçoes e operações simples com as informações que fazem referência ao perfil dos docentes, foi encontrado que para o programa de Psicologia Clínica e Cultural existem 19 docentes. 
+
+```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+#Número de Pessoas que foram encontradas
+length(perfil320)
+##Análise dos dados em formato list
+# Número de áreas de atuação cumulativo
+sum(sapply(perfil320, function(x) nrow(x$areas_de_atuacao)))
+# Número de áreas de atuação por pessoa
+table(unlist(sapply(perfil320, function(x) nrow(x$areas_de_atuacao))))
+```
+
+Os 19 docentes atuaram 72 vezes em 2 grandes áreas, conforme distribuição representada pela seguinte tabela.
+
+```{r warning=F,message=F, echo=F}
+# Número de pessoas por grande area
+kable(data.frame(table(unlist(sapply(perfil320, function(x) (x$areas_de_atuacao$grande_area)))))[-1,], col.names=c("Área","Atuações por Área"), caption="Quantidade de Atuaçõess por Grande Área",row.names=F)
+```
+
+```{r warning=F,message=F, echo=F, include=F}
+# Número de pessoas que produziram os específicos tipos de produção
+table(unlist(sapply(perfil320, function(x) names(x$producao_bibiografica))))
+# Número de publicações por tipo
+sum(sapply(perfil320, function(x) length(x$producao_bibiografica$ARTIGO_ACEITO$ano)))
+sum(sapply(perfil320, function(x) length(x$producao_bibiografica$CAPITULO_DE_LIVRO$ano)))
+sum(sapply(perfil320, function(x) length(x$producao_bibiografica$LIVRO$ano)))
+sum(sapply(perfil320, function(x) length(x$producao_bibiografica$PERIODICO$ano)))
+sum(sapply(perfil320, function(x) length(x$producao_bibiografica$TEXTO_EM_JORNAIS$ano)))
+# Número de pessoas por quantitativo de produções por pessoa 0 = 1; 1 = 2...
+table(unlist(sapply(perfil320, function(x) length(x$producao_bibiografica$ARTIGO_ACEITO$ano))))
+table(unlist(sapply(perfil320, function(x) length(x$producao_bibiografica$CAPITULO_DE_LIVRO$ano))))
+table(unlist(sapply(perfil320, function(x) length(x$producao_bibiografica$LIVRO$ano))))
+table(unlist(sapply(perfil320, function(x) length(x$producao_bibiografica$PERIODICO$ano))))
+table(unlist(sapply(perfil320, function(x) length(x$producao_bibiografica$TEXTO_EM_JORNAIS$ano))))
+# Número de produções por ano
+table(unlist(sapply(perfil320, function(x) (x$producao_bibiografica$ARTIGO_ACEITO$ano))))
+table(unlist(sapply(perfil320, function(x) (x$producao_bibiografica$CAPITULO_DE_LIVRO$ano))))
+table(unlist(sapply(perfil320, function(x) (x$producao_bibiografica$LIVRO$ano))))
+table(unlist(sapply(perfil320, function(x) (x$producao_bibiografica$PERIODICO$ano))))
+table(unlist(sapply(perfil320, function(x) (x$producao_bibiografica$TEXTO_EM_JORNAIS$ano))))
+# Número de pessoas que realizaram diferentes tipos de orientações
+length(unlist(sapply(perfil320, function(x) names(x$orientacoes_academicas))))
+# Número de pessoas por tipo de orientação
+table(unlist(sapply(perfil320, function(x) names(x$orientacoes_academicas))))
+#Número de orientações concluidas
+sum(sapply(perfil320, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_MESTRADO$ano)))
+sum(sapply(perfil320, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_DOUTORADO$ano)))
+sum(sapply(perfil320, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_POS_DOUTORADO$ano)))
+
+# Número de pessoas por quantitativo de orientações por pessoa 0 = 1; 1 = 2...
+table(unlist(sapply(perfil320, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_MESTRADO$ano))))
+table(unlist(sapply(perfil320 , function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_DOUTORADO$ano))))
+table(unlist(sapply(perfil320, function(x) length(x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_POS_DOUTORADO$ano))))
+
+# Número de orientações por ano
+table(unlist(sapply(perfil320, function(x) (x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_MESTRADO$ano))))
+table(unlist(sapply(perfil320, function(x) (x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_DOUTORADO$ano))))
+table(unlist(sapply(perfil320, function(x) (x$orientacoes_academicas$ORIENTACAO_CONCLUIDA_POS_DOUTORADO$ano))))
+
+# extrai perfis dos professores 
+perfil.df.professores320 <- extrai.perfis(perfil320)
+
+# extrai producao bibliografica de todos os professores 
+perfil.df.publicacoes320 <- extrai.producoes(perfil320)
+
+#extrai orientacoes 
+perfil.df.orientacoes320 <- extrai.orientacoes(perfil320)
+
+#extrai areas de atuacao 
+perfil.df.areas.de.atuacao320 <- extrai.areas.atuacao(perfil320)
+
+#cria arquivo com dados quantitativos para análise
+perfil.df320 <- data.frame()
+perfil.df320 <- perfil.df.professores320 %>% 
+  select(idLattes, nome, resumo_cv, senioridade) %>% 
+  left_join(
+    perfil.df.orientacoes320 %>% 
+      select(orientacao, idLattes) %>% 
+      filter(!grepl("EM_ANDAMENTO", orientacao)) %>% 
+      group_by(idLattes) %>% 
+      count(orientacao) %>% 
+      spread(key = orientacao, value = n), 
+    by = "idLattes") %>% 
+  left_join(
+    perfil.df.publicacoes320 %>% 
+      select(tipo_producao, idLattes) %>% 
+      filter(!grepl("ARTIGO_ACEITO", tipo_producao)) %>% 
+      group_by(idLattes) %>% 
+      count(tipo_producao) %>% 
+      spread(key = tipo_producao, value = n), 
+    by = "idLattes") %>% 
+  left_join(
+    perfil.df.areas.de.atuacao320 %>% 
+      select(area, idLattes) %>% 
+      group_by(idLattes) %>% 
+      summarise(n_distinct(area)), 
+    by = "idLattes")
+```
+
+Quanto à quantidade de publicações por tipo, observa-se que eventos são aqueles com maior número de publicações.Em seguida aparecem capítulos de livros e periódicos. Artigos são aqueles que aparecem com menor frequência.
+
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center",fig.height=3}
+publicacoes320 <- perfil.df.publicacoes320 %>% group_by(tipo_producao) %>% summarise(total=n()) %>% arrange(desc(total)) %>%
+mutate(tipo_producao =tipo_producao %>% factor() %>% fct_relevel(tipo_producao) %>% 
+fct_recode("Periódicos"="PERIODICO","Eventos"="EVENTO","Capítulo de Livros" = "CAPITULO_DE_LIVRO",
+Livros = "LIVRO","Demais Tipos"="DEMAIS_TIPOS_DE_PRODUCAO_BIBLIOGRAFICA",
+Artigo = "ARTIGO_ACEITO", "Texto em Jornais" = "TEXTO_EM_JORNAIS"))
+
+ggplot(publicacoes315,aes(tipo_producao,total))+geom_col(fill=adjustcolor("blue",.4))+xlab("Tipo de Publicação")+ylab("Quantidade de Publicações")+theme(text = element_text(size=9))+
+ggtitle("Quantitativo de Publicações")
+```
+
+Considerando o ano em que foi publicado, observa-se que periódicos estão sempre em maior quantidade. Enquanto artigos e demais tipos se alternam nas classes em que houve menor número de publicações.
+
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center",fig.height=3}
+publicacoesano320 <- perfil.df.publicacoes320 %>% group_by(tipo_producao,ano) %>% summarise(total=n()) %>% arrange(desc(total)) %>% ungroup() %>% 
+mutate(tipo_producao=tipo_producao %>% factor() %>% 
+fct_recode("Periódicos"="PERIODICO","Eventos"="EVENTO","Capítulo de Livros" = "CAPITULO_DE_LIVRO",
+Livros = "LIVRO","Demais Tipos"="DEMAIS_TIPOS_DE_PRODUCAO_BIBLIOGRAFICA",
+Artigo = "ARTIGO_ACEITO", "Texto em Jornais" = "TEXTO_EM_JORNAIS"
+)) %>% filter(!is.na(ano))
+publicacoesano320 <- publicacoesano320 %>% spread(ano,total) %>% gather(ano,total,-tipo_producao) %>% mutate(ano=as.numeric(ano))
+publicacoesano320[is.na(publicacoesano320)] <- 0
+
+ggplot(publicacoesano320,aes(ano,total,color=tipo_producao))+geom_line()+xlab("Tipo de Publicação")+ylab("Quantidade de Publicações")+
+ggtitle("Quantitativo de Publicações")+scale_color_manual("Tipo de Publicação",values=c("red","blue","orange","green","purple","black"))
+```
+
+Ao avaliar as revistas em que ocorre o maior número de publicações, obtivemos a seguinte tabela, que revela que a "Revista Psicologia: Organizações e Trabalho" foi aquela com maior número de aparições do programa.
+
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center"}
+kable(head(sort(table(as.data.frame(unlist
+    (sapply(public320$PERIODICO, function(x) unlist(x$periodico)))
+  )), decreasing = TRUE),20), col.names = c("Revista","Número de Publicações"),position="center",caption="20 Revistas mais Publicadas")
+```
+
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center", include=F}
+public.periodico.df320 <- pub.ls2df(public320, 1) #artigos
+public.livros.df320 <- pub.ls2df(public320, 2) #livros
+public.eventos.df320 <- pub.ls2df(public320, 5) #eventos
+#Publicação por ano
+kable(table(public.periodico.df320$ano),col.names=c("Ano","Publicações"),caption="Quantidade de Publicações por Ano")
+```
+
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center", include=F}
+public.periodico.df320 %>%
+  group_by(ano) %>%
+  summarise(Quantidade = n()) %>%
+  ggplot(aes(x = ano, y = Quantidade)) +
+  geom_bar(position = "stack",stat = "identity", fill = "darkcyan")+
+  geom_text(aes(label=Quantidade), vjust=-0.3, size=2.5)+
+  theme_minimal()
+```
+
+Na avaliação dos eventos que tiveram participação de pessoas envolvidas com o programa de Psicologia Social, do Trabalho e das Organizações, percebemos com auxílio do gráfico a seguir que a grande maioria dos eventos frequentados ocorreu no Brasil, sem destaque quantitativo de qualquer outro país. 
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center",fig.height=3}
+  #Eventos
+public.eventos.df320 %>%
+  filter(pais_do_evento %in% 
+           c(names(head(sort(table(public.eventos.df320$pais_do_evento)
+                             , decreasing = TRUE), 10)))) %>%
+  group_by(ano_do_trabalho,pais_do_evento) %>%
+  ggplot(aes(x=ano_do_trabalho,y=pais_do_evento, color= pais_do_evento)) +
+  xlab("Ano") + ylab("Pais") + geom_point() + geom_jitter()
+
+##Análise dos dados no formato DF
+orient.posdoutorado.df320 <- ori.ls2df(orient320, 6) #pos-Doutorado concluído
+orient.doutorado.df320 <- ori.ls2df(orient320, 7) #Doutorado concluído
+orient.mestrado.df320 <- ori.ls2df(orient320, 8) #Mestrado concluído
+
+orient.df320 <- rbind(rbind(orient.posdoutorado.df320, orient.doutorado.df320), orient.mestrado.df320)
+```
+
+Em relação às orientações, foi identificado que no ano de 2014 aquelas relacionadas a mestrado se igualaram àquelas relacionadas a teses de doutorado. Nos demais anos, dissertações de mestrado foram aquelas com maior quantidade de orientações. Além disso, (como podemos observar no gráfico abaixo), nos anos de 2011 a 2015 houveram (poucas) orientações de supervisão de pós-doutorado.
+
+```{r,echo=F,message=FALSE, warning=FALSE, fig.align="center",fig.height=3}
+ggplot(orient.df320,aes(ano,fill=natureza)) +
+  geom_bar(stat = "count", position="dodge") +
+  ggtitle("Natureza das Orientações Completas Por Ano") +
+  theme(legend.position="right",legend.text=element_text(size=7)) +
+  guides(fill=guide_legend(nrow=5, byrow=TRUE, title.position = "top")) +
+  labs(x="Ano",y="Quantidade")
+```
+
+
+\newpage
+
+## Modelagem 
+
+Afim de obter resultados mais profundos a cerca dos programas, foram elaborados modelos para mineração do texto e análises das redes detectadas. Serão apresentados a seguir os resultados de ambos modelos para cada disciplina. 
+
+Para o modelo de redes foram consideradas os relações entre docentes dadas por colaborações em publicações. Para um melhor entendimento, os docentes colaboradores tiveram atributo do vértice definido com cor vermelha, e permanentes definidos com cor azul. Além disso, foi utilizado um algorítmo de detecção de comunidades para determinar grupos relacionados.  
+
+O texto considerado diz respeito ao título das publicações de cada um dos programas, e para apresentar o resultado foram feitas nuvens de palavras. O tamanho da palavra na nuvem é proporcinal à frequência com que aparece em publicações, isto é, maiores palavras são aquelas que aparecem com mais vezes, enquanto menores palavras aparecem com menos vezes.
+
+### Ciências do Comportamento
+
+#### Análise de Redes
+
+A imagem a seguir apresenta as redes de relacionamento detectadas no programa de pós-graduação de ciências do comportamento.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE,fig.align='center'}
+g <- g.ls2ig(graphl255)
+df <- as.data.frame(V(g)$name); colnames(df) <- "Idlattes"
+df <- left_join(df, df.prog, by = "Idlattes")
+#Apenas para fins de análise inicial, foram retiradas as observações 
+#com duplicação de pesquisadores no caso de haver professores em mais 
+#de um programa
+df <- df %>% group_by(Idlattes) %>% 
+  slice(1L)
+estatisticas <- perfil.df255 %>% select(idLattes,CAPITULO_DE_LIVRO:TEXTO_EM_JORNAIS) %>% gather(Tipo,qtd,-idLattes) %>% group_by(idLattes) %>% 
+  summarise(total=sum(qtd,na.rm=T))
+df <- left_join(df,estatisticas,by=c("Idlattes"="idLattes"))
+V(g)$programa <- df$Programa
+V(g)$orient_dout <- perfil.df255$ORIENTACAO_CONCLUIDA_DOUTORADO
+V(g)$orient_mest <- perfil.df255$ORIENTACAO_CONCLUIDA_MESTRADO
+V(g)$publicacao <- perfil.df255$PERIODICO
+V(g)$eventos <- perfil.df255$EVENTO
+V(g)$label <- V(g)$label %>% str_wrap(15)
+
+V(g)$categoria=df$Categoria
+
+par(mar=c(0,0,0,0))
+plot.igraph(g,vertex.frame.color=NA,vertex.label.cex = 0.6,
+            mark.groups = walktrap.community(g),
+            vertex.color=c(adjustcolor("red",0.5),adjustcolor("blue",.3))[V(g)$categoria %>% as.factor %>% as.numeric],
+            mark.col = adjustcolor("grey",0.5),mark.border = "white",vertex.label.color="black",vertex.size = V(g)$size
+            )
+
+require(knitr)
+#tabela_grafo <- df %>% select(-Programa)
+#names(tabela_grafo) <- c( "Idlattes","Docente","Categoria","Publicações")
+#kable(tabela_grafo)
+```
+
+Podemos observar que 9 grupos foram formados pelo algorítmo de identificação de comunidades, sendo 5 deles compostos por aapenas 1 indivíduo. É possível notar também que os pesquisadores "Wânia Cristina de Souza", "Goiara Mendonça de Castilho" e "Elenice Seixas Hanna" apresentam-se como pontos de articulação da rede, isto é, se fossem retirados, dois grupos de pesquisadores deixariam de estar conectados.
+
+
+
+\newpage
+
+#### Mineração dos Textos
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE,fig.align='center'}
+library(tm) 
+library(wordcloud)
+library(SnowballC)
+
+texto <- perfil.df.publicacoes255$titulo 
+
+
+texto <- VectorSource(texto)
+
+texto2<- Corpus(texto)
+texto3<-tm_map(texto2, removeWords, stopwords("portuguese"))
+texto3<-tm_map(texto3, removeWords, stopwords("en"))
+texto5<-tm_map(texto3, stripWhitespace)
+texto6<-tm_map(texto5, content_transformer(tolower))
+texto6<-tm_map(texto6, removeWords, "")
+wordcloud(texto6, min.freq=1, max.words = 40, 
+colors=c("darkgrey","lightblue","navy"),random.order=F)
+
+
+```
+
+
+A mineração de texto nos permite fazer uma análise muito rica e condizente com a realidade. Tendo em vista que o objetivo do programa é a análise comportamental, não é surpresa que palavras como "Análise", "$effects$" e "reinforcement" apareçam em com frequência. Além disso, podemos observar nomes como "rats" e "macacos" aparecem em destaque, o que faz sentido se considerado que muitos experimentos comportamentais são testados em animais.
+
+\newpage
+
+### Processos de Desenvolvimento Humano e Saúde 
+
+#### Análise de Redes
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE,fig.align='center'}
+g <- g.ls2ig(graphl315)
+df <- as.data.frame(V(g)$name); colnames(df) <- "Idlattes"
+df <- left_join(df, df.prog, by = "Idlattes")
+#Apenas para fins de análise inicial, foram retiradas as observações 
+#com duplicação de pesquisadores no caso de haver professores em mais 
+#de um programa
+df <- df %>% group_by(Idlattes) %>% 
+  slice(1L)
+estatisticas <- perfil.df315 %>% select(idLattes,CAPITULO_DE_LIVRO:TEXTO_EM_JORNAIS) %>% gather(Tipo,qtd,-idLattes) %>% group_by(idLattes) %>% 
+  summarise(total=sum(qtd,na.rm=T))
+df <- left_join(df,estatisticas,by=c("Idlattes"="idLattes"))
+V(g)$programa <- df$Programa
+V(g)$orient_dout <- perfil.df315$ORIENTACAO_CONCLUIDA_DOUTORADO
+V(g)$orient_mest <- perfil.df315$ORIENTACAO_CONCLUIDA_MESTRADO
+V(g)$publicacao <- perfil.df315$PERIODICO
+V(g)$eventos <- perfil.df315$EVENTO
+V(g)$label <- V(g)$label %>% str_wrap(15)
+
+V(g)$categoria=df$Categoria
+
+par(mar=c(0,0,0,0))
+plot.igraph(g,vertex.frame.color=NA,vertex.label.cex = 0.6,
+            mark.groups = walktrap.community(g),
+            vertex.color=c(adjustcolor("red",0.5),adjustcolor("blue",.3))[V(g)$categoria %>% as.factor %>% as.numeric],
+            mark.col = adjustcolor("grey",0.5),mark.border = "white",vertex.label.color="black"
+            )
+
+require(knitr)
+#tabela_grafo <- df %>% select(-Programa)
+#names(tabela_grafo) <- c( "Idlattes","Docente","Categoria","Publicações")
+#kable(tabela_grafo)
+```
+
+Podemos notar no gráfico de redes que são formadas muitas comunidades, indicando que existem poucos relacionamentos entre os docentos (tornando a densidade do gráfico baixa). Em outros palavras, no programa de Processos de Desenvolvimento Humano e Saúde não parece haver muitas relações entre os docentes via publicações. 
+
+\pagebreak
+
+#### Mineração dos Textos
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE,fig.align='center'}
+library(tm) 
+library(wordcloud)
+library(SnowballC)
+
+
+texto <- perfil.df.publicacoes319$titulo 
+
+
+texto <- VectorSource(texto)
+
+texto2<- Corpus(texto)
+texto3<-tm_map(texto2, removeWords, stopwords("portuguese"))
+texto3<-tm_map(texto3, removeWords, stopwords("en"))
+texto5<-tm_map(texto3, stripWhitespace)
+texto6<-tm_map(texto5, content_transformer(tolower))
+texto6<-tm_map(texto6, removeWords, "")
+wordcloud(texto6, min.freq=1, max.words = 40, 
+colors=c("darkgrey","lightblue","navy"),random.order=F)
+
+
+```
+
+A mineração de texto resulta em palavras-chave esperadas, tendo em vissta que a área do programa trata do desenvolvimento humano e saúde.
+A palavra "saúde" aparece com grande destaque dentre todas as outras observadas.
+
+
+\newpage
+
+### Psicologia Clínica e Cultural
+#### Análise de Redes
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE,fig.align='center'}
+g <- g.ls2ig(graphl319)
+df <- as.data.frame(V(g)$name); colnames(df) <- "Idlattes"
+df <- left_join(df, df.prog, by = "Idlattes")
+#Apenas para fins de análise inicial, foram retiradas as observações 
+#com duplicação de pesquisadores no caso de haver professores em mais 
+#de um programa
+df <- df %>% group_by(Idlattes) %>% 
+  slice(1L)
+estatisticas <- perfil.df319 %>% select(idLattes,CAPITULO_DE_LIVRO:TEXTO_EM_JORNAIS) %>% gather(Tipo,qtd,-idLattes) %>% group_by(idLattes) %>% 
+  summarise(total=sum(qtd,na.rm=T))
+df <- left_join(df,estatisticas,by=c("Idlattes"="idLattes"))
+V(g)$programa <- df$Programa
+V(g)$orient_dout <- perfil.df319$ORIENTACAO_CONCLUIDA_DOUTORADO
+V(g)$orient_mest <- perfil.df319$ORIENTACAO_CONCLUIDA_MESTRADO
+V(g)$publicacao <- perfil.df319$PERIODICO
+V(g)$eventos <- perfil.df319$EVENTO
+V(g)$label <- V(g)$label %>% str_wrap(15)
+
+V(g)$categoria=df$Categoria
+
+par(mar=c(0,0,0,0))
+plot.igraph(g,vertex.frame.color=NA,vertex.label.cex = 0.6,
+            mark.groups = walktrap.community(g),
+            vertex.color=c(adjustcolor("red",0.5),adjustcolor("blue",.3))[V(g)$categoria %>% as.factor %>% as.numeric],
+            mark.col = adjustcolor("grey",0.5),mark.border = "white",vertex.label.color="black"
+)
+
+require(knitr)
+#tabela_grafo <- df %>% select(-Programa)
+#names(tabela_grafo) <- c( "Idlattes","Docente","Categoria","Publicações")
+#kable(tabela_grafo)
+```
+
+Podemos notar no gráfico de redes que  não são formadas muitas comunidades através dos algorítmos típicos de análise de redes, o que é um indício de que não existe muitas conexões de forma geral entre os docentes. Entretanto, podemos observar que a pesquisadora "Daniela Scheinkman Chatelard" e "Eliana Rigoto Lazzarini" parecem possuir um certo destaque no que diz respeito à influências por publicações. 
+
+Um ponto interessante que não foi levantado até aqui, mas parece ser constante nas redes dos programas, é que os docentes colaboradores não aparecem no centro da rede, e nunca são pontos de articulação. Essa característica, sugere menor influência de colaboradores em comparação à permanentes (no que diz respeito à relacionamentos em publicações). 
+
+\newpage 
+
+#### Mineração dos Textos
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE,fig.align='center'}
+library(tm) 
+library(wordcloud)
+library(SnowballC)
+
+
+
+
+
+texto <- perfil.df.publicacoes319$titulo 
+
+texto <- VectorSource(texto)
+texto2<- Corpus(texto)
+texto3<-tm_map(texto2, removeWords, stopwords("portuguese"))
+texto3<-tm_map(texto3, removeWords, stopwords("en"))
+texto5<-tm_map(texto3, stripWhitespace)
+texto6<-tm_map(texto5, content_transformer(tolower))
+texto6<-tm_map(texto6, removeWords, "")
+wordcloud(texto6, min.freq=1, max.words = 40, 
+colors=c("darkgrey","lightblue","navy"),random.order=F)
+
+
+```
+
+A mineração de texto resulta em palavras-chave semelhantes ao programa anterior. Tendo em vista que a área do programa trata ainda mais diretamente com a saúde por ser da área clínica, é de se esperar que a palavra "saúde" apareça com grande destaque dentre todas as outras observadas.
+
+\newpage
+
+### Psicologia Social, do Trabalho e das Organizações (PSTO) 
+
+#### Análise de Redes
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE,fig.align='center',fig.align='center'}
+g <- g.ls2ig(graphl320)
+df <- as.data.frame(V(g)$name); colnames(df) <- "Idlattes"
+df <- left_join(df, df.prog, by = "Idlattes")
+#Apenas para fins de análise inicial, foram retiradas as observações 
+#com duplicação de pesquisadores no caso de haver professores em mais 
+#de um programa
+df <- df %>% group_by(Idlattes) %>% 
+  slice(1L)
+estatisticas <- perfil.df320 %>% select(idLattes,CAPITULO_DE_LIVRO:TEXTO_EM_JORNAIS) %>% gather(Tipo,qtd,-idLattes) %>% group_by(idLattes) %>% 
+  summarise(total=sum(qtd,na.rm=T))
+df <- left_join(df,estatisticas,by=c("Idlattes"="idLattes"))
+V(g)$programa <- df$Programa
+V(g)$orient_dout <- perfil.df320$ORIENTACAO_CONCLUIDA_DOUTORADO
+V(g)$orient_mest <- perfil.df320$ORIENTACAO_CONCLUIDA_MESTRADO
+V(g)$publicacao <- perfil.df320$PERIODICO
+V(g)$eventos <- perfil.df320$EVENTO
+V(g)$label <- V(g)$label %>% str_wrap(15)
+
+V(g)$categoria=df$Categoria
+
+par(mar=c(0,0,0,0))
+plot.igraph(g,vertex.frame.color=NA,vertex.label.cex = 0.6,
+            mark.groups = walktrap.community(g),
+            vertex.color=c(adjustcolor("red",0.5),adjustcolor("blue",.3))[V(g)$categoria %>% as.factor %>% as.numeric],
+            mark.col = adjustcolor("grey",0.5),mark.border = "white",vertex.label.color="black"
+)
+
+require(knitr)
+#tabela_grafo <- df %>% select(-Programa)
+#names(tabela_grafo) <- c( "Idlattes","Docente","Categoria","Publicações")
+#kable(tabela_grafo)
+```
+
+Neste programa é observado o menor número de comunidades (mais pessoas por grupo) formadss pelo algorítmo de identificação. Além disso, é possível notar que os pesquisadores "Jacob Arie Laros", "Katia Elizabeth Puente-Palacios" e "Juliana Barreiros Porto" se destacam em seus respectivos grupos por estarem conectados com um grande numero de pesquisaadores. Mais uma vez, colbaradores aparecem nas extremidades das redes, com medida de centralidade e quantidade de conexões diminuída quando comparada com docentes permanentes.
+
+\newpage
+#### Mineração dos Textos
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE,fig.align='center'}
+library(tm) 
+library(wordcloud)
+library(SnowballC)
+
+texto <- perfil.df.publicacoes320$titulo 
+
+texto <- VectorSource(texto)
+
+texto2<- Corpus(texto)
+texto3<-tm_map(texto2, removeWords, stopwords("portuguese"))
+texto3<-tm_map(texto3, removeWords, stopwords("en"))
+texto5<-tm_map(texto3, stripWhitespace)
+texto6<-tm_map(texto5, content_transformer(tolower))
+texto6<-tm_map(texto6, removeWords, "")
+wordcloud(texto6, min.freq=1, max.words = 40, 
+colors=c("darkgrey","lightblue","navy"),random.order=F)
+
+```
+
+A mineração de texto resulta em palavras-chave bastante diversificadas. Tendo em vista que o programa trata de áreas consideravelmente abrangentes, podemos considerar que o resultado é esperado. A palavra "trabalho", por exemplo, aparece com grande destaque dentre todas as outras observadas.
+
+\pagebreak
+
+# Conclusão
+
+Com base nos resultados apresentados é possível concluir que:
+
+* Em todos os programas avaliados, a área em que ocorre maior quantidade de atuações é a de ciências humanas.
+
+* No programa de Ciências do Comportamento existem 20 docentess. As produções bibliográficas do programa de concentram em periódicos e eventos, sendo a "Revista Brasileira de Análise do Comportamento" aquela que mais publica. Os eventos frequentados por pessoas relacionadas ocorrem principalmente no Brasil e nos Estados Unidos. 
+
+* Sobre o programa de Processos de Desenvolvimento Humano e Saúde, foi verificado que conta com 14 docentes, atuando em 3 áreas, e produzindo principalmente em eventos e capítulos de livros. A revista com maior quantidade de publicações do programa é a "Psicologia em Estudo" (com 8 publicações) e os eventos mais frequentados por docentes ocorrem no Brasil, Estados Unidos e Portugal.
+
+* Em relação ao programa de Psicologia clínica e cultura, encontramos o equivalente à 26 docentes. As produções ocorrem principalmente em periódicos e eventos, e "Psicologia: Teoria e Pesquisa" é a revista que mais publica. Além disso, os eventos frequentados ocorrem majoritariamente no Brasil e nos Estados Unidos.
+
+* No que diz respeito ao programa de Psicologia Social, do Trabalho e das organizações, identificou-se 19 docentes, apresentando produção bliográfica principalmente em eventos e capítulos de livros. A revista que mais publica docentes do programa é "Revista Psicologia: Organização e Trabalho", e os eventos mais frequentados ocorrem no Brasil, sem destaques para qualquer outro país.
+
+* Em relação ás orientações realizadas, percebe-se que em todos os programas o comportamento é semelhante. Orientações relacionadas à mestrados são as que se destacam quantitativamente, seguidas por teses de doutorado. Enquanto o menor número de orientações diz respeito a supervisões de pós-doutorado, que em muitos anos não tem sequer um único registro. Tal resultado não é surpreendente, dado que existem mais pessoas que fazem mestrado do que pessoas que fazem doutorado e pós-doutorado.
+
+* Com base nas nuvens de palavras construídas com auxílio da mineração do texto, foi possível perceber que os títulos das produções dão são coerentes com os temas e áreas relacionados. Revelando que palavras mais frequentes próximas dos nomes.
+
+* As análises de redes revelaram que os programas de Ciências do Comportamento, e Psicologia Social, do Trabalho e das Organizações, tem densidade (quantidade de relacionamentos) maior do que os outros dois programas considerados, apresentando menor número de comunidades detectadas. Além disso, foi interessante observar que docentes registrados como colaboradores não aparecem como pontos de articulação, ou com centralidade elevada em relação à docentes permanentes em nenhuma das redes avaliadas.
